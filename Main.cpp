@@ -195,8 +195,8 @@ int arrayScreen[ARRAY_DY][ARRAY_DX] = {
   { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 },
   { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 },
   { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 },
-  { 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-  { 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+  { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 },
+  { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 },
   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
@@ -216,14 +216,15 @@ void deleteFullLines(Matrix *screen)
     const int idxDepth = SCREEN_DY-count-1;
     Matrix *blkLine = screen->clip(idxDepth, SCREEN_DW, idxDepth+1, SCREEN_DX+SCREEN_DW);
     if (blkLine->sum() == SCREEN_DX){
-      blkLine->mulc(0);
-      screen->paste(blkLine, idxDepth, SCREEN_DW);
       Matrix *newScreen = new Matrix((int *) arrayScreen, ARRAY_DY, ARRAY_DX);
-      Matrix *remainBlk = screen->clip(0, SCREEN_DW, idxDepth, SCREEN_DX+SCREEN_DW);
-      newScreen->paste(remainBlk, count+1, SCREEN_DW);
+      Matrix *upRemain = screen->clip(0, SCREEN_DW, idxDepth, SCREEN_DX+SCREEN_DW);
+      Matrix *dnRemain = screen->clip(idxDepth+1, SCREEN_DW, SCREEN_DY, SCREEN_DX+SCREEN_DW);
+      newScreen->paste(upRemain, 1, SCREEN_DW);
+      newScreen->paste(dnRemain, idxDepth, SCREEN_DW);
       screen->paste(newScreen, 0 ,0);
       delete newScreen;
-      delete remainBlk;
+      delete upRemain;
+      delete dnRemain;  
       count = -1;
     }
     delete blkLine;
@@ -234,21 +235,14 @@ int main(int argc, char *argv[]) {
   srand((unsigned int)time(NULL));
   char key;
   int top = 0, left = ARRAY_DX/2-2;
-  int idxBlockDegree = rand() % MAX_BLK_DEGREES;
+  int idxBlockDegree = 0;
   int blkType = rand() % MAX_BLK_TYPES;
-
-  // Matrix A((int *) arrayBlk, 3, 3);
-  // Matrix B(A);
-  // Matrix C(A);
-  // Matrix D;
-  // D = A + B + C;
-  // cout<<D<<'\n';
-  // return 0;
 
   Matrix *setOfBlockObjects[MAX_BLK_TYPES][MAX_BLK_DEGREES];
   Matrix *typeOfBlks[MAX_BLK_TYPES];
   for (int i = 0; i < MAX_BLK_TYPES; i++)for(int j = 0; j < MAX_BLK_DEGREES; j++){setOfBlockObjects[i][j] = new Matrix((int *) setOfBlockArrays[i*MAX_BLK_DEGREES+j], TCol[i], TRow[i]);}
-  for (int i = 0; i < MAX_BLK_TYPES; i++){typeOfBlks[i] = new Matrix(setOfBlockObjects[i][idxBlockDegree]);}
+  for (int i = 0; i < MAX_BLK_TYPES; i++){typeOfBlks[i] = new Matrix(setOfBlockObjects[i][0]);}
+
   Matrix *iScreen = new Matrix((int *) arrayScreen, ARRAY_DY, ARRAY_DX);
   Matrix *currBlk = new Matrix(typeOfBlks[blkType]);
   Matrix *tempBlk = iScreen->clip(top, left, top + currBlk->get_dy(), left + currBlk->get_dx());
@@ -262,13 +256,13 @@ int main(int argc, char *argv[]) {
   delete oScreen;
 
   while ((key = getch()) != 'q') {
-    idxBlockDegree = (idxBlockDegree + 1) % MAX_BLK_DEGREES;
     switch (key) {
       case 'a': left--; break;
       case 'd': left++; break;
       case 's': top++; break;
       case 'w':
       delete currBlk;
+      idxBlockDegree = (idxBlockDegree + 1) % MAX_BLK_DEGREES;
       currBlk = new Matrix(setOfBlockObjects[blkType][idxBlockDegree]);
       break;
       case ' ':
@@ -291,21 +285,19 @@ int main(int argc, char *argv[]) {
           case 'a': left++; break;
           case 'd': left--; break;
           case 'w':
-          delete currBlk;
           idxBlockDegree = (idxBlockDegree+3) % MAX_BLK_DEGREES;
+          delete currBlk;
           currBlk = new Matrix(setOfBlockObjects[blkType][idxBlockDegree]);
           break;
           case 's':
           case ' ':
           top--;
-          tempBlk = iScreen->clip(top, left, top + currBlk->get_dy(), left + currBlk->get_dx());
-          tempBlk2 = tempBlk->add(currBlk);
+          tempBlk = iScreen->clip(top, left, top + currBlk->get_dy(), left + currBlk->get_dx());tempBlk2 = tempBlk->add(currBlk);
           iScreen->paste(tempBlk2, top, left);
-          delete tempBlk;
-          delete tempBlk2;
+          delete tempBlk;delete tempBlk2;
           deleteFullLines(iScreen);
           blkType = rand() % MAX_BLK_TYPES;
-          idxBlockDegree = rand() % MAX_BLK_DEGREES;
+          idxBlockDegree = 0;
           delete currBlk;
           currBlk = new Matrix(typeOfBlks[blkType]);
           top = 0, left = ARRAY_DX/2-2;
