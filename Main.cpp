@@ -319,7 +319,7 @@ int main(int argc, char *argv[]) {
   delete currBlk;
   for (int i = 0; i < MAX_BLK_TYPES; i++){delete typeOfBlks[i];}
   for (int i = 0; i < MAX_BLK_TYPES; i++)for(int j = 0; j < MAX_BLK_DEGREES; j++){delete setOfBlockObjects[i][j];}
-  cout << "(nAlloc, nFree) = (" << Matrix::get_nAlloc() << ',' << Matrix::get_nFree() << ")" << endl;  
+  cout << "(nAlloc, nFree) = (" << Matrix::get_nAlloc() << ',' << Matrix::get_nFree() << ")" << '\n';  
   cout << "Program terminated!" << endl;
 
   return 0;
