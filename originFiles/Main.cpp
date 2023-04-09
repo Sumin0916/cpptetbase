@@ -211,20 +211,16 @@ int arrayBlk[3][3] = {
 
 void deleteFullLines(Matrix *screen)
 {
-  int count = 0;
-  for (count; count < SCREEN_DY; count++){
+  for (int count = 0; count < SCREEN_DY; count++){
     const int idxDepth = SCREEN_DY-count-1;
     Matrix *blkLine = screen->clip(idxDepth, SCREEN_DW, idxDepth+1, SCREEN_DX+SCREEN_DW);
     if (blkLine->sum() == SCREEN_DX){
-      Matrix *newScreen = new Matrix((int *) arrayScreen, ARRAY_DY, ARRAY_DX);
+      Matrix *upcleaned = new Matrix(idxDepth+1, SCREEN_DX);
       Matrix *upRemain = screen->clip(0, SCREEN_DW, idxDepth, SCREEN_DX+SCREEN_DW);
-      Matrix *dnRemain = screen->clip(idxDepth+1, SCREEN_DW, SCREEN_DY, SCREEN_DX+SCREEN_DW);
-      newScreen->paste(upRemain, 1, SCREEN_DW);
-      newScreen->paste(dnRemain, idxDepth, SCREEN_DW);
-      screen->paste(newScreen, 0 ,0);
-      delete newScreen;
+      screen->paste(upcleaned, 0, SCREEN_DW);
+      screen->paste(upRemain, 1, SCREEN_DW);
+      delete upcleaned;  
       delete upRemain;
-      delete dnRemain;  
       count = -1;
     }
     delete blkLine;
@@ -292,7 +288,8 @@ int main(int argc, char *argv[]) {
           case 's':
           case ' ':
           top--;
-          tempBlk = iScreen->clip(top, left, top + currBlk->get_dy(), left + currBlk->get_dx());tempBlk2 = tempBlk->add(currBlk);
+          tempBlk = iScreen->clip(top, left, top + currBlk->get_dy(), left + currBlk->get_dx());
+          tempBlk2 = tempBlk->add(currBlk);
           iScreen->paste(tempBlk2, top, left);
           delete tempBlk;delete tempBlk2;
           deleteFullLines(iScreen);
@@ -306,6 +303,11 @@ int main(int argc, char *argv[]) {
       tempBlk = iScreen->clip(top, left, top + currBlk->get_dy(), left + currBlk->get_dx());
       tempBlk2 = tempBlk->add(currBlk);
       delete tempBlk;
+    }
+    if(tempBlk2->anyGreaterThan(1)){
+      cout<<"========================Game Over!!========================"<<'\n';
+      delete tempBlk2;
+      break;
     }
     oScreen = new Matrix(iScreen);
     oScreen->paste(tempBlk2, top, left);
