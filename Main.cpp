@@ -309,6 +309,7 @@ int main(int argc, char *argv[]) {
     }
     if(tempBlk2->anyGreaterThan(1)){
       cout<<"Game Over!!"<<'\n';
+      delete tempBlk2;
       break;
     }
     oScreen = new Matrix(iScreen);
