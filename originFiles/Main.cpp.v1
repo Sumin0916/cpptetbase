@@ -171,41 +171,7 @@ void drawScreen(Matrix *screen, int wall_depth)
     cout << endl;
   }
 }
-
-void drawScreen(const Matrix &screen, int wall_depth)
-{
-  int dy = screen.get_dy();
-  int dx = screen.get_dx();
-  int dw = wall_depth;
-  int **array = screen.get_array();
-
-  for (int y = 0; y < dy - dw + 1; y++) {
-    for (int x = dw - 1; x < dx - dw + 1; x++) {
-      if (array[y][x] == 0)
-	      cout << "□ ";
-      else if (array[y][x] == 1)
-	      cout << "■ ";
-      else if (array[y][x] == 10)
-	      cout << "◈ ";
-      else if (array[y][x] == 20)
-	      cout << "★ ";
-      else if (array[y][x] == 30)
-	      cout << "● ";
-      else if (array[y][x] == 40)
-	      cout << "◆ ";
-      else if (array[y][x] == 50)
-	      cout << "▲ ";
-      else if (array[y][x] == 60)
-	      cout << "♣ ";
-      else if (array[y][x] == 70)
-	      cout << "♥ ";
-      else
-	      cout << "X ";
-    }
-    cout << endl;
-  }
-}
-
+  
 /**************************************************************/
 /******************** Tetris Main Loop ************************/
 /**************************************************************/
@@ -239,31 +205,20 @@ int arrayBlk[3][3] = {
 
 int main(int argc, char *argv[]) {
   char key;
-  int blkType;
   int top = 0, left = 4;
 
-  Matrix A((int *) arrayBlk, 3, 3);
-  Matrix B(A);
-  Matrix C(A);
-  Matrix D;
-  D = A + B + C;
-  cout << D << endl;
-  //return 0;
+  Matrix *iScreen = new Matrix((int *) arrayScreen, ARRAY_DY, ARRAY_DX);
+  Matrix *currBlk = new Matrix((int *) arrayBlk, 3, 3);
+  Matrix *tempBlk = iScreen->clip(top, left, top + currBlk->get_dy(), left + currBlk->get_dx());
+  Matrix *tempBlk2 = tempBlk->add(currBlk);
+  delete tempBlk;
 
-  srand((unsigned int)time(NULL));
-  blkType = rand() % MAX_BLK_TYPES;
-  cout << "blkType = " << blkType << endl;
-
-  Matrix iScreen((int *) arrayScreen, ARRAY_DY, ARRAY_DX);
-  Matrix currBlk((int *) arrayBlk, 3, 3);
-  Matrix tempBlk = iScreen.clip_(top, left, top + currBlk.get_dy(), left + currBlk.get_dx());
-  Matrix tempBlk2 = tempBlk + currBlk;
-
-  Matrix oScreen(iScreen);
-  oScreen.paste(tempBlk2, top, left);
+  Matrix *oScreen = new Matrix(iScreen);
+  oScreen->paste(tempBlk2, top, left);
+  delete tempBlk2;
   drawScreen(oScreen, SCREEN_DW);
+  delete oScreen;
 
-  cout << "(nAlloc, nFree) = (" << Matrix::get_nAlloc() << ',' << Matrix::get_nFree() << ")" << endl;  
   while ((key = getch()) != 'q') {
     switch (key) {
       case 'a': left--; break;
@@ -274,9 +229,10 @@ int main(int argc, char *argv[]) {
       default: cout << "wrong key input" << endl;
     }
 
-    tempBlk = iScreen.clip_(top, left, top + currBlk.get_dy(), left + currBlk.get_dx());
-    tempBlk2 = tempBlk + currBlk;
-    if (tempBlk2.anyGreaterThan(1)) {
+    tempBlk = iScreen->clip(top, left, top + currBlk->get_dy(), left + currBlk->get_dx());
+    tempBlk2 = tempBlk->add(currBlk);
+    delete tempBlk;
+    if (tempBlk2->anyGreaterThan(1)) {
       switch (key) {
         case 'a': left++; break;
         case 'd': left--; break;
@@ -284,15 +240,24 @@ int main(int argc, char *argv[]) {
         case 'w': break;
         case ' ': break;
       }
-      tempBlk = iScreen.clip_(top, left, top + currBlk.get_dy(), left + currBlk.get_dx());
-      tempBlk2 = tempBlk + currBlk;
+      delete tempBlk2;
+      tempBlk = iScreen->clip(top, left, top + currBlk->get_dy(), left + currBlk->get_dx());
+      tempBlk2 = tempBlk->add(currBlk);    
+      delete tempBlk;
     }
     
-    oScreen.paste(iScreen, 0, 0);
-    oScreen.paste(tempBlk2, top, left);
+    oScreen = new Matrix(iScreen);
+    oScreen->paste(tempBlk2, top, left);
+    delete tempBlk2;
     drawScreen(oScreen, SCREEN_DW);
-    cout << "(nAlloc, nFree) = (" << Matrix::get_nAlloc() << ',' << Matrix::get_nFree() << ")" << endl;  
+    delete oScreen;
   }
+
+  delete iScreen;
+  delete currBlk;
+  //delete tempBlk;
+  //delete tempBlk2;
+  //delete oScreen;
 
   cout << "(nAlloc, nFree) = (" << Matrix::get_nAlloc() << ',' << Matrix::get_nFree() << ")" << endl;  
   cout << "Program terminated!" << endl;
