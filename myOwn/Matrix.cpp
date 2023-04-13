@@ -3,9 +3,9 @@
 int Matrix::nAlloc = 0;
 int Matrix::nFree = 0;
 
-int Matrix::get_nFree() { return nFree; }
-
 int Matrix::get_nAlloc() { return nAlloc; }
+
+int Matrix::get_nFree() { return nFree; }
 
 int Matrix::get_dy() const { return dy; }
 
@@ -33,7 +33,7 @@ void Matrix::alloc(int cy, int cx){
     return;
 }
 
-void dealloc() {
+void Matrix::dealloc() {
     if (array != nullptr) {
         for (int y = 0; y < dy; y++)
             delete[] array[y];
@@ -60,7 +60,7 @@ Matrix::Matrix(const Matrix &obj) {
     alloc(obj.dy, obj.dx);
     for (int y = 0; y < dy; y++)
         for (int x = 0; x < dx; x++)
-            arraty[y][x] = obj.array[y][x];
+            array[y][x] = obj.array[y][x];
 }
 
 Matrix::Matrix(int *arr, int col, int row) {
@@ -71,34 +71,37 @@ Matrix::Matrix(int *arr, int col, int row) {
 }
 
 Matrix *Matrix::clip(int top, int left, int bottom, int right) {
-    int cy = bottom - top;
-    int cx = right - left;
+    int cy = bottom - top; int cx = right - left;
     Matrix *temp = new Matrix(cy, cx);
-    for (int y = 0; y < dy; y++)
-        for (int x = 0; x < dx; x++)
-            if ((top + y >= 0) && (top + y < dy) && 
-                (left + x >= 0) && (left + x < dx))
-                temp->array[y][x] = array[top + y][left + x];
+    for (int y = 0; y < cy; y++) {
+        for (int x = 0; x < cx; x++) {
+            int diff_y = top + y; int diff_x = left + x;
+            if ((diff_y >= 0) && (diff_y < dy) && (diff_x >= 0) && (diff_x < dx))
+                temp->array[y][x] = array[diff_y][diff_x];
             else {
                 cerr << "Invalid matrix range";
                 delete temp;
                 return nullptr;
             }
+        }
+    }
     return temp;
 }
 
-Matrix *Matrix::clip_(int top, int left, int bottom, int right) {
+Matrix Matrix::clip_(int top, int left, int bottom, int right) {
     int cy = bottom - top;
     int cx = right - left;
-    Matrix temp = Matrix(cy, cx);
-    for (int y = 0; y < dy; y++)
-        for (int x = 0; x < dx; x++)
+    Matrix temp(cy, cx);
+    for (int y = 0; y < cy; y++) {
+        for (int x = 0; x < cx; x++) {
             if ((top + y >= 0) && (top + y < dy) && (left + x >= 0) && (left + x < dx))
                 temp.array[y][x] = array[top + y][left + x];
             else {
                 cerr << "Invalid matrix range";
                 return Matrix();
             }
+        }
+    }
     return temp;
 }
 
@@ -108,6 +111,9 @@ void Matrix::paste(const Matrix *obj, int top, int left) {
             int diff_y = top + y; int diff_x = left + x;
             if ((diff_y >= 0) && (diff_y < dy) && (diff_x >= 0) && (diff_x < dx))
                 array[diff_y][diff_x] = obj->array[y][x];
+            else {
+                cerr << "Invaild matrix range";
+            }
         }
     return;
 }
@@ -118,11 +124,14 @@ void Matrix::paste(const Matrix &obj, int top, int left) {
             int diff_y = top + y; int diff_x = left + x;
             if ((diff_y >= 0) && (diff_y < dy) && (diff_x >= 0) && (diff_x < dx))
                 array[diff_y][diff_x] = obj.array[y][x];
+            else {
+                cerr << "Invaild matrix range";
+            }
         }
     return;
 }
 
-Matrix *Matrix::add(const Matirx *obj) {
+Matrix *Matrix::add(const Matrix *obj) {
     if ((dy != obj->dy) || (dx != obj->dx)) return NULL;
     Matrix *temp = new Matrix(dy, dx);
     for (int y = 0; y < dy; y++)
@@ -131,7 +140,7 @@ Matrix *Matrix::add(const Matirx *obj) {
     return temp;
 }
 
-Matrix *Matrix::add(const Matirx &obj) {
+Matrix *Matrix::add(const Matrix &obj) {
     if ((dy != obj.dy) || (dx != obj.dx)) return NULL;
     Matrix *temp = new Matrix(dy, dx);
     for (int y = 0; y < dy; y++)
@@ -164,7 +173,7 @@ void Matrix::mulc(int coef) {
     return;
 }
 
-int *Matrix::int2bool() {
+Matrix *Matrix::int2bool() {
     Matrix *temp = new Matrix(dy, dx);
     int **t_array = temp->get_array();
     for (int y = 0; y < dy; y++)

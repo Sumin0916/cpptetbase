@@ -18,9 +18,9 @@ public:
     static int get_nFree();
     int get_dx() const;
     int get_dy() const;
-    int **get_array const;
+    int **get_array() const;
     Matrix();
-    Matrix(int cy; int cx);
+    Matrix(int cy, int cx);
     Matrix(const Matrix &obj);
     Matrix(const Matrix *obj);
     Matrix(int *arr, int col, int row);
@@ -29,8 +29,8 @@ public:
     Matrix clip_(int top, int left, int bottom, int right);
     void paste(const Matrix *obj, int top, int left);
     void paste(const Matrix &obj, int top, int left);
-    Matrix *add(const Matirx *obj);
-    Matrix *add(const Matirx &obj);
+    Matrix *add(const Matrix *obj);
+    Matrix *add(const Matrix &obj);
     const Matrix operator+(const Matrix& m1) const;
     int sum();
     void mulc(int coef);
@@ -39,4 +39,4 @@ public:
     void print();
     friend ostream& operator<<(ostream& out, const Matrix& obj);
     Matrix& operator=(const Matrix& obj);
-}
+}; /* 이거 ; 빼먹지 말자 **************************/
