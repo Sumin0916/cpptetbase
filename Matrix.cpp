@@ -31,18 +31,13 @@ Matrix::Matrix() { alloc(0, 0); }
 
 Matrix::~Matrix() { 
   for (int y = 0; y < dy; y++)
-    delete array[y];
-  delete array;
-
+    delete[] array[y];
+  delete[] array;
+  array = nullptr;
   nFree++;
 }
 
-Matrix::Matrix(int cy, int cx) {
-  alloc(cy, cx);
-  for (int y = 0; y < dy; y++)
-    for (int x = 0; x < dx; x++)
-      array[y][x] = 0;
-}
+Matrix::Matrix(int cy, int cx) { alloc(cy, cx); }
 
 Matrix::Matrix(const Matrix *obj) {
   alloc(obj->dy, obj->dx);
