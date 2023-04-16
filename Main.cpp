@@ -221,7 +221,7 @@ void deleteFullLines(Matrix *screen)
       screen->paste(upRemain, 1, SCREEN_DW);
       delete upcleaned;  
       delete upRemain;
-      count = -1;
+      count--;
     }
     delete blkLine;
   }
