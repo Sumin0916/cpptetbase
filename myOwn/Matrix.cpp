@@ -211,13 +211,12 @@ ostream& operator<<(ostream& out, const Matrix& obj) {
     return out;
 }
 
-Matrix&  Matrix::operator=(const Matrix &obj) {
+Matrix& Matrix::operator=(const Matrix& obj) {
     if (this == &obj) { return *this; }
-    if ((dy != obj.dy) || (dx != obj.dx)) {
+    if ((obj.dy != dy) && (obj.dx != dx)) {
         if (this != nullptr) dealloc();
         alloc(obj.dy, obj.dx);
     }
-
     for (int y = 0; y < dy; y++)
         for (int x = 0; x < dx; x++)
             array[y][x] = obj.array[y][x];

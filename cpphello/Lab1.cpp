@@ -124,7 +124,7 @@ int main4(int argc, char *argv[]) {
 }
 
 #include "Matrix.h"
-class MyMatrix : public Matrix {
+class MyMatrix : public Matrix { //inherit example
 public:
   MyMatrix() : Matrix() {}
   MyMatrix(int cy, int cx) : Matrix(cy, cx) { }

@@ -245,14 +245,6 @@ int main(int argc, char *argv[]) {
   int blkType;
   int top = 0, left = 4;
 
-  Matrix A((int *) arrayBlk, 3, 3);
-  Matrix B(A);
-  Matrix C(A);
-  Matrix D;
-  D = A + B + C;
-  cout << D << endl;
-  //return 0;
-
   srand((unsigned int)time(NULL));
   blkType = rand() % MAX_BLK_TYPES;
   cout << "blkType = " << blkType << endl;

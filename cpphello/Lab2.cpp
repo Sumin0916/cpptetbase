@@ -116,6 +116,3 @@ int main(int argc, char *argv[]) {
     cout << "usage: " << argv[0] << " [function number]" << endl;
   return 0;
 }
-
-
-  
