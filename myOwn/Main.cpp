@@ -228,6 +228,10 @@ void deleteFullLines(Matrix *screen)
 }
 
 int main(int argc, char *argv[]) {
+  Matrix a([0, 1, 0, 1, 1, 1, 0, 0, 0], 3, 3);
+  a++;
+  a.print();
+  return 0;
   srand((unsigned int)time(NULL));
   char key;
   int top = 0, left = ARRAY_DX/2-2;

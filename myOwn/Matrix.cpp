@@ -223,3 +223,18 @@ Matrix& Matrix::operator=(const Matrix& obj) {
 
     return *this;
 }
+
+Matrix& Matrix::operator++(int) {
+    Matrix temp(*this);
+    for (int i = 0; i < dy; i++)
+        for (int j = 0; j < dx; j++)
+            temp.array[i][j] = this->array[i][j]+1;
+    return temp;
+}
+
+Matrix& Matrix::operator++() {
+    for (int i = 0; i < dy; i++)
+        for (int j = 0; j < dx; j++)
+            this->array[i][j] += 1;
+    return *this;
+}
