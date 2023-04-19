@@ -39,6 +39,6 @@ public:
     void print();
     friend ostream& operator<<(ostream& out, const Matrix& obj);
     Matrix& operator=(const Matrix& obj);
-    Matrix& operator++(int);
+    const Matrix& operator++(int);
     Matrix& operator++();
 }; /* 이거 ; 빼먹지 말자 **************************/

@@ -224,11 +224,11 @@ Matrix& Matrix::operator=(const Matrix& obj) {
     return *this;
 }
 
-Matrix& Matrix::operator++(int) {
-    Matrix temp(*this);
+const Matrix& Matrix::operator++(int) {
+    const Matrix temp(*this);
     for (int i = 0; i < dy; i++)
         for (int j = 0; j < dx; j++)
-            temp.array[i][j] = this->array[i][j]+1;
+            this->array[i][j] += 1;
     return temp;
 }
 
