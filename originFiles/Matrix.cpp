@@ -15,9 +15,9 @@ int **Matrix::get_array() const { return array; }
 
 void Matrix::alloc(int cy, int cx) {
   if ((cy <= 0) || (cx <= 0)) {
-	dy = 0;
-	dx = 0;
-	array = NULL;
+    dy = 0;
+    dx = 0;
+    array = NULL;
     nAlloc++;
     return;
   }
@@ -42,7 +42,6 @@ void Matrix::dealloc() {
     delete[] array;
     array = NULL;
   }
-
   nFree++;
 }
 
