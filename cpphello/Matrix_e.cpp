@@ -37,6 +37,7 @@ Matrix::~Matrix() {
 }
 
 Matrix::Matrix(int cy, int cx) throw(MatrixException) {
+  //if (cy < 0 || cx < 0) {throw MatrixException("TEST ERROR!");}
   alloc(cy, cx);
   for (int y = 0; y < dy; y++)
     for (int x = 0; x < dx; x++)

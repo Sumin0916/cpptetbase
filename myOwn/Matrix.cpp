@@ -235,6 +235,6 @@ const Matrix& Matrix::operator++(int) {
 Matrix& Matrix::operator++() {
     for (int i = 0; i < dy; i++)
         for (int j = 0; j < dx; j++)
-            this->array[i][j] += 1;
+            array[i][j] += 1;
     return *this;
 }

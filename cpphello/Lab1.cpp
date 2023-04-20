@@ -81,8 +81,8 @@ int main3(int argc, char *argv[]) {
 
   vector<int> v1(A1, A1 + 5);
   vector<int> v3(A3, A3 + 5);
-  cout << "equal(v1, v3)=" << equal(v1.begin(), v1.end(), v3.begin());
-  cout << "equal(v1, v3)=" << v1 == v2;
+  cout << "equal(v1, v3)=" << equal(v1.begin(), v1.end(), v3.begin())<<'\n';
+  cout << "equal(v1, v3)=" << (v1 == v3);
   cout << endl;
 
   return 0;

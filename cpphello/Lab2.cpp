@@ -11,7 +11,7 @@ int main1(int argc, char *argv[]) {
 
   for (int i=0; i<999; i++)
     delete m[i];
-
+ 
   cout << "nAlloc=" << m[1000]->get_nAlloc() << endl;
   cout << "nFree=" << m[1000]->get_nFree() << endl;
   return 0;
@@ -26,11 +26,12 @@ int main2(int argc, char *argv[]) { // why no "throws Exception"???
   try {
     Matrix *currBlk = new Matrix((int *) arrayBlk, 3, 3);
     Matrix *tempBlk = new Matrix(5,5);
+    Matrix *tempBlk4 = new Matrix(5,-1000);
     //Matrix *tempBlk = new Matrix(-1,-1); // falls into the second catch
-    Matrix *tempBlk2;
-    tempBlk2 = tempBlk->add(currBlk); // falls into the first catch
+    //Matrix *tempBlk2;
+    //tempBlk2 = tempBlk->add(currBlk); // falls into the first catch
     delete tempBlk;
-    tempBlk2->print();
+    //tempBlk2->print();
   } catch(MismatchedMatrixException& e) {
     cout << "at first catch: " << e.getMessage() << endl;
   } catch(MatrixException& e) {
@@ -68,7 +69,7 @@ int main3(int argc, char *argv[]) {
     { 0, 0, 0 },
   };
   Matrix *oScreen = new Matrix((int *) arrayScreen, 6, 12);
-  cout << "oScreen:" << endl;
+  cout << "oScreen:" << endl;Matrix *tempBlk = new Matrix(5,5);
   drawMatrix(oScreen); cout << endl;
 
   Matrix *currBlk = new Matrix((int *) arrayBlk, 3, 3);
@@ -82,7 +83,7 @@ int main3(int argc, char *argv[]) {
   drawMatrix(tempBlk); cout << endl;
 
   Matrix *tempBlk2 = tempBlk->add(currBlk); delete tempBlk;
-  cout << "tempBlk (after add):" << endl;
+  cout << "tempBlk2 (after add):" << endl;
   drawMatrix(tempBlk2); cout << endl;
 
   oScreen->paste(tempBlk2, top, left);
