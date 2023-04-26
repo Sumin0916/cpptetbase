@@ -26,9 +26,9 @@ void Tetris::init(int **setOfBlockArrays, int nTypes, int nDegrees) {
   for (int t = 0; t < numTypes; t++) {
     int *array = setOfBlockArrays[numDegrees * t];
     int idx, size;
-    for (idx = 0; array[idx] != -1 ; idx++); // find the element of -1 in array[]
-    for (size = 0; size*size < idx; size++); // comupte the square root of idx
-    wallDepth = (size > wallDepth ? size : wallDepth);
+    for (idx = 0; array[idx] != -1 ; idx++); // find the element of -1 in array[] / 원소의 개수 카운트
+    for (size = 0; size*size < idx; size++); // comupte the square root of idx / 루트를 씌운다(수학함수 쓰기 싫어서.. 이렇게) 숫자 싫어! 하드코딩 실렁
+    wallDepth = (size > wallDepth ? size : wallDepth); 
     for (int d = 0; d < numDegrees; d++) { // allocate matrix objects
       setOfBlockObjects[t][d] = new Matrix(setOfBlockArrays[numDegrees * t + d], size, size);
       //cout << *setOfBlockObjects[t][d] << endl;
@@ -103,7 +103,7 @@ Tetris::Tetris(int cy, int cx) {
   currBlk = NULL;
   state = TetrisState::NewBlock;
 
-  //cout << *iScreen << endl;
+  //cout << *iScreen << endl; 디버깅용 코드
   deallocArrayScreen(arrayScreen);
 }
 

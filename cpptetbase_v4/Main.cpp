@@ -179,7 +179,28 @@ void drawScreen(Matrix *screen, int wall_depth)
 
 int main(int argc, char *argv[]) {
   char key;
+  registerAlarm();
+  srand((unsigned int) time(NULL));
+  TetrisState state;
+  Tetris::init(setOfBlockArrays, MAX_BLK_TYPES, MAX_BLK_DEGREES);
+  Tetris *board = new Tetris(10, 10);
+  key = (char) ('0' + rand() % board->get_wallDepth());
+  board->accept(key);
+  drawScreen(board->get_oScreen(), board->get_wallDepth()); cout << endl;
 
+  while ((key = getch()) != 'q') {
+    state = board->accept(key);
+    drawScreen(board->get_oScreen(), board->get_wallDepth()); cout << endl;
+    if (state == TetrisState::NewBlock) {
+      key = (char) ('0' + rand() % board->get_wallDepth());
+      state = board->accept(key);
+      drawScreen(board->get_oScreen(), board->get_wallDepth()); cout << endl;
+      if (state == TetrisState::Finished) break;
+    }
+  }
+
+  delete board;
+  Tetris::deinit();
   cout << "(nAlloc, nFree) = (" << Matrix::get_nAlloc() << ',' << Matrix::get_nFree() << ")" << endl;  
   cout << "Program terminated!" << endl;
   return 0;
