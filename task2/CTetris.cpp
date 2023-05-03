@@ -8,13 +8,19 @@ using namespace std;
 
 Matrix *** CTetris::setOfColorBlockObjects = NULL;
 
-void CTetris::init(int **setOfColorBlockArrays, int nTypes, int nDegrees) { //deinit을 참고해서 구현, or 부모의 init와 구조 비슷
+void CTetris::init(int **setOfColorBlockArrays, int nTypes, int nDegrees) {
   if (setOfColorBlockObjects != NULL) // already allocated?
     deinit();
 
-  Tetris::init(setOfColorBlockArrays, nTypes, nDegrees); // call superclass' function 이 구조는 유지해야한다.
-
-  // write the rest of this function!!
+  Tetris::init(setOfColorBlockArrays, nTypes, nDegrees);
+  setOfColorBlockObjects = new Matrix**[nTypes];
+  for(int c = 0; c < nTypes; c++) {
+    setOfColorBlockObjects[c] = new Matrix*[nDegrees];
+    for(int d = 0; d < nDegrees; d++) {
+        Matrix temp = *setOfBlockObjects[c][d]; temp.mulc(c+1);
+        setOfColorBlockObjects[c][d] = new Matrix(temp);
+      }
+  }
 }
 
 void CTetris::deinit(void) {
@@ -52,15 +58,29 @@ CTetris::~CTetris() {
 /// mutators
 TetrisState CTetris::accept(char key) {
 
-  TetrisState _state = Tetris::accept(key); // call superclass' function 이것도 구조를 유지해야한다.
-  // 웬만하면 부보 클래스한테 다 떠넘길 수 있으면 좋은거다.
-  // 충돌테스트는 어디에 ?
-  // 무식한 방법: 자식의 accept를 거창하게 작성한다. 부모의 accept를 안 부르게 된다. 색상값에 대해서 충돌 테스트를 어떻게 할지?
-  // 부모의 accept를 최대한 사용해야 한다.
-  // write the rest of this function!!
+  TetrisState _state = Tetris::accept(key);
+  if (_state == TetrisState::Finished) return _state;
+  else if (_state == TetrisState::NewBlock) {
+  _state = TetrisState::Running;
+  currCBlk = setOfColorBlockObjects[type][degree];
+  Matrix *tempBlk = iScreen->clip(top, left, top + currBlk->get_dy(), left + currBlk->get_dx());
+  Matrix *tempBlk2 = tempBlk->add(currBlk);
+  delete tempBlk;
+  oCScreen->paste(iCScreen, 0, 0);
+  oCScreen->paste(tempBlk2, top, left);
+  if (tempBlk2->anyGreaterThan(1)) // exit the game
+      _state = TetrisState::Finished;
+  delete tempBlk2;
+  }
+  else if (_state == TetrisState::Running) {
+    if (touchDown) {
+      oCScreen = deleteFullLines(oCScreen, currCBlk, top, wallDepth);
+      iCScreen->paste(oCScreen, 0, 0);
+      _state = TetrisState::NewBlock;
+    }
 
-  // you can use the following code if you want to
-  // oCScreen = deleteFullLines(oCScreen, currCBlk, top, wallDepth);
+    return state;
+  }
 
   return _state;
 }
