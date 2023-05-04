@@ -211,11 +211,11 @@ int main(int argc, char *argv[]) {
   /////////////////////////////////////////////////////////////////////////
   /// Plug-in architecture for generalized Tetris class
   /////////////////////////////////////////////////////////////////////////
-  Tetris::setOperation('a', TetrisState::Running, new MyOnLeft(),    TetrisState::Running, new MyOnRight(), TetrisState::Running);
-  Tetris::setOperation('d', TetrisState::Running, new MyOnRight(), TetrisState::Running, new MyOnLeft(),    TetrisState::Running);
-  Tetris::setOperation('s', TetrisState::Running, new OnDown(), TetrisState::Running, new OnUp(),     TetrisState::NewBlock);
+  Tetris::setOperation('a', TetrisState::Running, new MyOnLeft(),    TetrisState::Running, new MyOnRight(),  TetrisState::Running);
+  Tetris::setOperation('d', TetrisState::Running, new MyOnRight(), TetrisState::Running, new MyOnLeft(),     TetrisState::NewBlock);
+  Tetris::setOperation('s', TetrisState::Running, new OnDown(), TetrisState::Running, new OnUp(),           TetrisState::NewBlock);
   Tetris::setOperation('w', TetrisState::Running,  new OnClockWise(),    TetrisState::Running, new OnCounterClockWise(),  TetrisState::Running);
-  Tetris::setOperation(' ', TetrisState::Running, new OnDrop(),   TetrisState::Running, new OnUp(),     TetrisState::NewBlock);
+  Tetris::setOperation(' ', TetrisState::Running, new OnDrop(),   TetrisState::Running, new OnUp(),          TetrisState::NewBlock);
   Tetris::setOperation('0', TetrisState::NewBlock, new OnNewBlock(), TetrisState::Running, new OnFinished(), TetrisState::Finished);
   Tetris::setOperation('1', TetrisState::NewBlock, new OnNewBlock(), TetrisState::Running, new OnFinished(), TetrisState::Finished);
   Tetris::setOperation('2', TetrisState::NewBlock, new OnNewBlock(), TetrisState::Running, new OnFinished(), TetrisState::Finished);

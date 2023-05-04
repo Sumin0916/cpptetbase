@@ -237,7 +237,7 @@ TetrisState Tetris::accept(char key) {
       }
       delete tempBlk2;
       tempBlk = iScreen->clip(top, left, top + currBlk->get_dy(), left + currBlk->get_dx());
-      tempBlk2 = tempBlk->add(currBlk);    
+      tempBlk2 = tempBlk->add(currBlk); 
       delete tempBlk;
     }
 
