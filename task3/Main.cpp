@@ -200,9 +200,13 @@ public:
     }
 };
 
+class myDeleteFullLines() : public ActionHandler {
+public:
+    void
+}
+
 int main(int argc, char *argv[]) {
   char key;
-  registerAlarm(); // register one-second timer
   srand((unsigned int)time(NULL)); // init the random number generator
   
   TetrisState state;
@@ -213,7 +217,8 @@ int main(int argc, char *argv[]) {
   /////////////////////////////////////////////////////////////////////////
   Tetris::setOperation('a', TetrisState::Running, new MyOnLeft(),    TetrisState::Running, new MyOnRight(), TetrisState::Running);
   Tetris::setOperation('d', TetrisState::Running, new MyOnRight(), TetrisState::Running, new MyOnLeft(),    TetrisState::Running);
-  Tetris::setOperation('s', TetrisState::Running, new OnDown(), TetrisState::Running, new OnUp(),     TetrisState::NewBlock);
+  Tetris::setOperation('s', TetrisState::Running, new OnDown(), TetrisState::Running, new OnUp(),     TetrisState::Running);
+  Tetris::setOperation('e', TetrisState::Running, new OnUp(), TetrisState::Running, new OnDown(),     TetrisState::Running);
   Tetris::setOperation('w', TetrisState::Running,  new OnClockWise(),    TetrisState::Running, new OnCounterClockWise(),  TetrisState::Running);
   Tetris::setOperation(' ', TetrisState::Running, new OnDrop(),   TetrisState::Running, new OnUp(),     TetrisState::NewBlock);
   Tetris::setOperation('0', TetrisState::NewBlock, new OnNewBlock(), TetrisState::Running, new OnFinished(), TetrisState::Finished);
