@@ -13,6 +13,8 @@
 #include "Matrix.h"
 #include "Tetris.h"
 
+#define endl '\n'
+
 using namespace std;
 
 
@@ -147,10 +149,10 @@ void drawScreen(Matrix *screen, int wall_depth)
   int **array = screen->get_array();
 
   for (int x = 0; x < dx - 2*dw; x++) {
-    string digit = "0" + to_string(x) + " ";
+    string digit = to_string(x) + " ";
     cout << digit;
   }
-  cout << endl;
+  cout << '/' << endl;
 
   for (int y = dw; y < dy - dw; y++) {
     for (int x = dw; x < dx - dw; x++) {
@@ -173,9 +175,9 @@ void drawScreen(Matrix *screen, int wall_depth)
       else if (array[y][x] == 70)
 	      cout << "♥ ";
       else
-	      cout << "XX ";
+	      cout << "X ";
     }
-    string digit = "0" + to_string(y-dw) + " ";
+    string digit = to_string(y-dw) + " ";
     cout << digit << endl;
   }
 }
@@ -184,28 +186,34 @@ void drawScreen(Matrix *screen, int wall_depth)
 /******************** Tetris Main Loop ************************/
 /**************************************************************/
 
-class MyOnLeft : public ActionHandler {
-public:
-    void run(Tetris *t, char key) {
-        t->left = t->left - 1;
-        return;
-    }
-};
-
-class MyOnRight : public ActionHandler {
-public:
-    void run(Tetris *t, char key) {
-        t->left = t->left + 1;
-        return;
-    }
-};
-
-class myDeleteFullLines() : public ActionHandler {
-public:
-    void
+Matrix *myDeleteFullLines(Matrix *screen, Matrix *blk, int top, int dw) {
+	return;
 }
 
-int main(int argc, char *argv[]) {
+class onPass : public ActionHandler {
+	public:
+    	void run(Tetris *t, char key) {
+    		return;
+    	}
+};
+
+class myOnNewBlock : public ActionHandler {
+	public:
+		void run(Tetris *t, char key) {
+			if (t->currBlk != NULL) // why test currBlk != NULL?
+            t->oScreen = myDeleteFullLines(t->oScreen, t->currBlk, t->top, t->wallDepth);
+			t->iScreen->paste(t->oScreen, 0, 0);
+			// select a new block
+			t->type = key - '0';
+			t->degree = 0;
+			t->top = t->wallDepth; 
+			t->left = t->cols/2 - t->wallDepth/2;
+			t->currBlk = t->setOfBlockObjects[t->type][t->degree];
+        	return;
+		}
+};
+
+int main(int argc, char *argv[]) {  
   char key;
   srand((unsigned int)time(NULL)); // init the random number generator
   
@@ -215,19 +223,19 @@ int main(int argc, char *argv[]) {
   /////////////////////////////////////////////////////////////////////////
   /// Plug-in architecture for generalized Tetris class
   /////////////////////////////////////////////////////////////////////////
-  Tetris::setOperation('a', TetrisState::Running, new MyOnLeft(),    TetrisState::Running, new MyOnRight(), TetrisState::Running);
-  Tetris::setOperation('d', TetrisState::Running, new MyOnRight(), TetrisState::Running, new MyOnLeft(),    TetrisState::Running);
-  Tetris::setOperation('s', TetrisState::Running, new OnDown(), TetrisState::Running, new OnUp(),     TetrisState::Running);
-  Tetris::setOperation('e', TetrisState::Running, new OnUp(), TetrisState::Running, new OnDown(),     TetrisState::Running);
-  Tetris::setOperation('w', TetrisState::Running,  new OnClockWise(),    TetrisState::Running, new OnCounterClockWise(),  TetrisState::Running);
-  Tetris::setOperation(' ', TetrisState::Running, new OnDrop(),   TetrisState::Running, new OnUp(),     TetrisState::NewBlock);
-  Tetris::setOperation('0', TetrisState::NewBlock, new OnNewBlock(), TetrisState::Running, new OnFinished(), TetrisState::Finished);
-  Tetris::setOperation('1', TetrisState::NewBlock, new OnNewBlock(), TetrisState::Running, new OnFinished(), TetrisState::Finished);
-  Tetris::setOperation('2', TetrisState::NewBlock, new OnNewBlock(), TetrisState::Running, new OnFinished(), TetrisState::Finished);
-  Tetris::setOperation('3', TetrisState::NewBlock, new OnNewBlock(), TetrisState::Running, new OnFinished(), TetrisState::Finished);
-  Tetris::setOperation('4', TetrisState::NewBlock, new OnNewBlock(), TetrisState::Running, new OnFinished(), TetrisState::Finished);
-  Tetris::setOperation('5', TetrisState::NewBlock, new OnNewBlock(), TetrisState::Running, new OnFinished(), TetrisState::Finished);
-  Tetris::setOperation('6', TetrisState::NewBlock, new OnNewBlock(), TetrisState::Running, new OnFinished(), TetrisState::Finished);
+  Tetris::setOperation('a', TetrisState::Running,  new OnLeft(),      TetrisState::Running,  new onPass(),     TetrisState::Running);
+  Tetris::setOperation('d', TetrisState::Running,  new OnRight(),     TetrisState::Running,  new onPass(),      TetrisState::Running);
+  Tetris::setOperation('s', TetrisState::Running,  new OnDown(),      TetrisState::Running,  new onPass(),        TetrisState::Running);
+  Tetris::setOperation('e', TetrisState::Running,  new OnUp(), 	      TetrisState::Running,  new onPass(),      TetrisState::Running);
+  Tetris::setOperation(' ', TetrisState::Running,  new onPass(),      TetrisState::NewBlock, new onPass(), TetrisState::Running);
+  Tetris::setOperation('0', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
+  Tetris::setOperation('1', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
+  Tetris::setOperation('2', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
+  Tetris::setOperation('3', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
+  Tetris::setOperation('4', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
+  Tetris::setOperation('5', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
+  Tetris::setOperation('6', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
+  Tetris::setOperation('w', TetrisState::Running,  new OnClockWise(), TetrisState::Running,  new onPass(),  TetrisState::Running);
   /////////////////////////////////////////////////////////////////////////
 
   Tetris *board = new Tetris(10, 10);
