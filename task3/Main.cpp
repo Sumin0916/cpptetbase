@@ -3,6 +3,7 @@
 #include <ctime>
 #include <stdio.h>
 #include <termios.h>
+#include <vector>
 
 #include <unistd.h>
 #include <errno.h>
@@ -12,8 +13,6 @@
 #include "colors.h"
 #include "Matrix.h"
 #include "Tetris.h"
-
-#define endl '\n'
 
 using namespace std;
 
@@ -95,6 +94,10 @@ void registerAlarm() {
 /**************************************************************/
 #define MAX_BLK_TYPES 7
 #define MAX_BLK_DEGREES 4
+#define ROW 0
+#define COL 1
+#define endl '\n'
+
 
 int T0D0[] = { 1, 1, 1, 1, -1 };
 int T0D1[] = { 1, 1, 1, 1, -1 };
@@ -186,13 +189,39 @@ void drawScreen(Matrix *screen, int wall_depth)
 /******************** Tetris Main Loop ************************/
 /**************************************************************/
 
-Matrix *myDeleteFullLines(Matrix *screen, Matrix *blk, int top, int dw) {
-	return;
+Matrix *myDeleteFullLines(Matrix *screen, Matrix *blk, int top, int left, int dw) {
+	Matrix *rowZero, *colZero, *rowLine, *colLine;
+  	vector<pair<int, int>> deleteLineNum;
+	int screenLenth = screen->get_dy() - (2*dw);
+	rowZero = new Matrix(1, screenLenth); colZero = new Matrix(screenLenth, 1);
+	rowLine = new Matrix(); colLine = new Matrix();
+
+  	for (int i = 0; i <= dw; i++) {
+		int rowInd = top + i; int colInd = left + i;
+		if (rowInd < screenLenth + dw){delete rowLine; rowLine = screen->clip(rowInd, dw, rowInd+1, dw + screenLenth);}
+		if (colInd < screenLenth + dw){delete colLine; colLine = screen->clip(dw, colInd, dw + screenLenth, colInd+1);}
+		if (rowLine->sum() == screenLenth) deleteLineNum.push_back(make_pair(ROW, rowInd));
+		if (colLine->sum() == screenLenth) deleteLineNum.push_back(make_pair(COL, colInd));
+		delete rowLine; delete colLine;
+  	}
+
+	for (auto lineInfo: deleteLineNum) {
+		int lineType = lineInfo.first; int lineInd = lineInfo.second;
+		if (lineType == ROW) screen->paste(rowZero, dw+lineInd, dw);
+		else if (lineType == COL) screen->paste(colZero, dw, dw+lineInd);
+	}
+
+	delete rowZero; delete colZero;
+	return screen;
 }
 
 class onPass : public ActionHandler {
 	public:
     	void run(Tetris *t, char key) {
+			if (t->top <= 0) t->top = t->top + 1;
+			else if ((t->top + t->currBlk->get_dy()) >= (t->rows)) t->top = t->top - 1;
+			else if (t->left <= 0) t->left = t->left + 1;
+			else if ((t->left + t->currBlk->get_dx()) >= (t->cols)) t->left = t->left - 1;
     		return;
     	}
 };
@@ -200,46 +229,44 @@ class onPass : public ActionHandler {
 class myOnNewBlock : public ActionHandler {
 	public:
 		void run(Tetris *t, char key) {
-			if (t->currBlk != NULL) // why test currBlk != NULL?
-            t->oScreen = myDeleteFullLines(t->oScreen, t->currBlk, t->top, t->wallDepth);
+			if (t->currBlk != NULL)
+            t->oScreen = myDeleteFullLines(t->oScreen, t->currBlk, t->top, t->left, t->wallDepth);
 			t->iScreen->paste(t->oScreen, 0, 0);
-			// select a new block
 			t->type = key - '0';
 			t->degree = 0;
 			t->top = t->wallDepth; 
 			t->left = t->cols/2 - t->wallDepth/2;
 			t->currBlk = t->setOfBlockObjects[t->type][t->degree];
-        	return;
+      		return; 
 		}
 };
 
 int main(int argc, char *argv[]) {  
   char key;
-  srand((unsigned int)time(NULL)); // init the random number generator
+  srand((unsigned int)time(NULL));
   
   TetrisState state;
-  Tetris::init(setOfBlockArrays, MAX_BLK_TYPES, MAX_BLK_DEGREES);
   
   /////////////////////////////////////////////////////////////////////////
-  /// Plug-in architecture for generalized Tetris class
-  /////////////////////////////////////////////////////////////////////////
-  Tetris::setOperation('a', TetrisState::Running,  new OnLeft(),      TetrisState::Running,  new onPass(),     TetrisState::Running);
-  Tetris::setOperation('d', TetrisState::Running,  new OnRight(),     TetrisState::Running,  new onPass(),      TetrisState::Running);
-  Tetris::setOperation('s', TetrisState::Running,  new OnDown(),      TetrisState::Running,  new onPass(),        TetrisState::Running);
-  Tetris::setOperation('e', TetrisState::Running,  new OnUp(), 	      TetrisState::Running,  new onPass(),      TetrisState::Running);
-  Tetris::setOperation(' ', TetrisState::Running,  new onPass(),      TetrisState::NewBlock, new onPass(), TetrisState::Running);
-  Tetris::setOperation('0', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
+  Tetris::setOperation('a', TetrisState::Running,  new OnLeft(),        TetrisState::Running,  new onPass(),      TetrisState::Running);
+  Tetris::setOperation('d', TetrisState::Running,  new OnRight(),       TetrisState::Running,  new onPass(),      TetrisState::Running);
+  Tetris::setOperation('s', TetrisState::Running,  new OnDown(),        TetrisState::Running,  new onPass(),      TetrisState::Running);
+  Tetris::setOperation('e', TetrisState::Running,  new OnUp(), 	        TetrisState::Running,  new onPass(),      TetrisState::Running);
+  Tetris::setOperation(' ', TetrisState::Running,  new onPass(),        TetrisState::NewBlock, new onPass(), 	  TetrisState::Running);
   Tetris::setOperation('1', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
   Tetris::setOperation('2', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
   Tetris::setOperation('3', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
   Tetris::setOperation('4', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
   Tetris::setOperation('5', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
   Tetris::setOperation('6', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
-  Tetris::setOperation('w', TetrisState::Running,  new OnClockWise(), TetrisState::Running,  new onPass(),  TetrisState::Running);
+  Tetris::setOperation('0', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
+  Tetris::setOperation('w', TetrisState::Running,  new OnClockWise(),   TetrisState::Running,  new onPass(),  	  TetrisState::Running);
   /////////////////////////////////////////////////////////////////////////
 
+  Tetris::init(setOfBlockArrays, MAX_BLK_TYPES, MAX_BLK_DEGREES);
   Tetris *board = new Tetris(10, 10);
-  key = (char) ('0' + rand() % board->get_numTypes());
+  //key = (char) ('0' + rand() % board->get_numTypes());
+  key = '0';
   board->accept(key);
   drawScreen(board->get_oScreen(), board->get_wallDepth()); cout << endl;
 
@@ -247,7 +274,8 @@ int main(int argc, char *argv[]) {
     state = board->accept(key);
     drawScreen(board->get_oScreen(), board->get_wallDepth()); cout << endl;
     if (state == TetrisState::NewBlock) {
-      key = (char) ('0' + rand() % board->get_numTypes());
+      //key = (char) ('0' + rand() % board->get_numTypes());
+	  key = '0';
       state = board->accept(key);
       drawScreen(board->get_oScreen(), board->get_wallDepth()); cout << endl;
       if (state == TetrisState::Finished) 
