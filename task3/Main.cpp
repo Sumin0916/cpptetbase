@@ -253,7 +253,7 @@ int main(int argc, char *argv[]) {
   Tetris::setOperation('d', TetrisState::Running,  new OnRight(),       TetrisState::Running,  new onPass(),      TetrisState::Running);
   Tetris::setOperation('s', TetrisState::Running,  new OnDown(),        TetrisState::Running,  new onPass(),      TetrisState::Running);
   Tetris::setOperation('e', TetrisState::Running,  new OnUp(), 	        TetrisState::Running,  new onPass(),      TetrisState::Running);
-  Tetris::setOperation(' ', TetrisState::Running,  new onPass(),        TetrisState::NewBlock, new onPass(), 	  TetrisState::Running);
+  Tetris::setOperation(' ', TetrisState::Running,  new onPass(),        TetrisState::NewBlock, new onPass(), 	    TetrisState::Running);
   Tetris::setOperation('1', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
   Tetris::setOperation('2', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
   Tetris::setOperation('3', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
