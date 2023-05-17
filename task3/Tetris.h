@@ -18,9 +18,9 @@ extern bool anyConflict(Matrix *tempBlk);
 //extern int *allocArrayScreen(int dy, int dx, int dw);
 //extern void deallocArrayScreen(int *array);
 
-class Tetris;
+class Tetris; // 이렇게 해줘야 한다. 실제 선언은 뒤에 있다. run에서 미리 tetris를 쓰기 떄문에 이렇게 시그니처를 적는다.
 
-class ActionHandler {
+class ActionHandler { //이음새를 정의하는 클래스 body가 없다 순수 가상 함수다 =0으로 정의 얘는 추상클래스라 객채를 못 만든다. 결국 얘를 상속받아서 재정의를 해야한다.
 public:
     virtual void run(Tetris *t, char key) = 0;
 };
@@ -29,7 +29,7 @@ public:
 class TetrisOperation {
 public:
     char key;
-    ActionHandler *hAction;
+    ActionHandler *hAction; // 상속받아서 자식 객채들이 만들어질 것인데 그 자식 객체들이 등록이 될 거라는 뜻이다 그냥 액션핸들러는 객채생성을 하지 못한다!
     ActionHandler *hCounterAction;
     TetrisState preState;
     TetrisState postAState;
@@ -43,7 +43,7 @@ public:
         postAState = s1;
         postCState = s2;
     }
-    ~TetrisOperation() {
+    virtual ~TetrisOperation() { //여기서 virtual를 빼먹었다 교수님은
         delete hAction;
         delete hCounterAction;  
     }
@@ -53,7 +53,7 @@ class Tetris {
 protected:
     // TetrisOperation related variables
     static int nOps;
-    static TetrisOperation *operations[MAX_TETRIS_OPERATIONS];
+    static TetrisOperation *operations[MAX_TETRIS_OPERATIONS]; //객체 포인터 배열
     static int findOpIdxByKey(char key);
     static void setDefaultOperations(void);
 
