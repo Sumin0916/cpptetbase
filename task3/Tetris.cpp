@@ -236,13 +236,13 @@ TetrisState Tetris::accept(char key) {
     cout << "wrong preState for the current key!" << endl;
     return state;
   }
-  op->hAction->run(this, key);
+  op->hAction->run(this, key); // 이거 this 기억하자!!!
   Matrix *tempBlk = overlap_currBlk();
   if (anyConflict(tempBlk) == false) {
     state = op->postAState;
   }
   else {
-    op->hCounterAction->run(this, key); 
+    op->hCounterAction->run(this, key); //런 함수는 몸통 클래스 입장에선 정의가 되어 있지 않다. 미래에 작성이 될 것이라는 것
     delete tempBlk;
     tempBlk = overlap_currBlk();
     state = op->postCState;

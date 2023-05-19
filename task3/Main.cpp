@@ -184,7 +184,7 @@ void drawScreen(Matrix *screen, int wall_depth)
     cout << digit << endl;
   }
 }
-  
+
 /**************************************************************/
 /******************** Tetris Main Loop ************************/
 /**************************************************************/
@@ -207,8 +207,8 @@ Matrix *myDeleteFullLines(Matrix *screen, Matrix *blk, int top, int left, int dw
 
 	for (auto lineInfo: deleteLineNum) {
 		int lineType = lineInfo.first; int lineInd = lineInfo.second;
-		if (lineType == ROW) screen->paste(rowZero, dw+lineInd, dw);
-		else if (lineType == COL) screen->paste(colZero, dw, dw+lineInd);
+		if (lineType == ROW) screen->paste(rowZero, lineInd, dw);
+		else if (lineType == COL) screen->paste(colZero, dw, lineInd);
 	}
 
 	delete rowZero; delete colZero;
@@ -303,7 +303,7 @@ int main(int argc, char *argv[]) {
     state = board->accept(key);
     drawScreen(board->get_oScreen(), board->get_wallDepth()); cout << endl;
     if (state == TetrisState::NewBlock) {
-      key = (char) ('0' + rand() % board->get_numTypes());
+	    key = (char) ('0' + rand() % board->get_numTypes());
       state = board->accept(key);
       drawScreen(board->get_oScreen(), board->get_wallDepth()); cout << endl;
       if (state == TetrisState::Finished) 
