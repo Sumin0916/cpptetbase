@@ -184,31 +184,31 @@ void drawScreen(Matrix *screen, int wall_depth)
     cout << digit << endl;
   }
 }
-
+  
 /**************************************************************/
 /******************** Tetris Main Loop ************************/
 /**************************************************************/
 
 Matrix *myDeleteFullLines(Matrix *screen, Matrix *blk, int top, int left, int dw) {
 	Matrix *rowZero, *colZero, *rowLine, *colLine;
-  	vector<pair<int, int>> deleteLineNum;
-  	int colLenth = screen->get_dx() - (2*dw); int rowLenth = screen->get_dy() - (2*dw);
+  vector<pair<int, int>> deleteLineNum;
+  int colLenth = screen->get_dx() - (2*dw); int rowLenth = screen->get_dy() - (2*dw);
 	rowZero = new Matrix(1, colLenth); colZero = new Matrix(rowLenth, 1);
 
-  	for (int i = 0; i < dw; i++) {
-		rowLine = new Matrix(); colLine = new Matrix();
-		int rowInd = top + i; int colInd = left + i;
-		if (dw <= rowInd && rowInd < rowLenth + dw){delete rowLine; rowLine = screen->clip(rowInd, dw, rowInd+1, dw + colLenth);}
-		if (dw <= colInd && colInd < colLenth + dw){delete colLine; colLine = screen->clip(dw, colInd, dw + rowLenth, colInd+1);}
-		if (rowLine->sum() == colLenth) deleteLineNum.push_back(make_pair(ROW, rowInd-dw));
-		if (colLine->sum() == rowLenth) deleteLineNum.push_back(make_pair(COL, colInd-dw));
-		delete rowLine; delete colLine;
-  	}
+  for (int i = 0; i < dw; i++) {
+    rowLine = new Matrix(); colLine = new Matrix();
+    int rowInd = top + i; int colInd = left + i;
+    if (dw <= rowInd && rowInd < rowLenth + dw){delete rowLine; rowLine = screen->clip(rowInd, dw, rowInd+1, dw + colLenth);}
+    if (dw <= colInd && colInd < colLenth + dw){delete colLine; colLine = screen->clip(dw, colInd, dw + rowLenth, colInd+1);}
+    if (rowLine->sum() == colLenth) deleteLineNum.push_back(make_pair(ROW, rowInd-dw));
+    if (colLine->sum() == rowLenth) deleteLineNum.push_back(make_pair(COL, colInd-dw));
+    delete rowLine; delete colLine;
+  }
 
 	for (auto lineInfo: deleteLineNum) {
 		int lineType = lineInfo.first; int lineInd = lineInfo.second;
-		if (lineType == ROW) screen->paste(rowZero, lineInd, dw);
-		else if (lineType == COL) screen->paste(colZero, dw, lineInd);
+		if (lineType == ROW) screen->paste(rowZero, dw+lineInd, dw);
+		else if (lineType == COL) screen->paste(colZero, dw, dw+lineInd);
 	}
 
 	delete rowZero; delete colZero;
@@ -217,57 +217,58 @@ Matrix *myDeleteFullLines(Matrix *screen, Matrix *blk, int top, int left, int dw
 
 class myOnUp : public ActionHandler {
 	public:
-    void run(Tetris *t, char key) {
-		t->top--;
-		if (t->top < 0) t->top++;
-		return;
-    }
+    	void run(Tetris *t, char key) {
+        t->top--;
+			  if (t->top < 0) t->top++;
+    	  return;
+    	}
 };
 
 class myOnLeft : public ActionHandler {
 	public:
-    void run(Tetris *t, char key) {
+    	void run(Tetris *t, char key) {
         t->left--;
-		if (t->left < 0) t->left++;
-    	return;
-    }
+			  if (t->left < 0) t->left++;
+    	  return;
+    	}
 };
 
 class myOnRight : public ActionHandler {
 	public:
-    void run(Tetris *t, char key) {
+    	void run(Tetris *t, char key) {
         t->left++;
-		if (t->left + t->currBlk->get_dx() > t->cols) t->left--;
-    	return;
-    }
+			  if (t->left + t->currBlk->get_dx() > t->cols) t->left--;
+    	  return;
+    	}
 };
 
 class myOnDown : public ActionHandler {
 	public:
-    void run(Tetris *t, char key) {
+    	void run(Tetris *t, char key) {
         t->top++;
-		if (t->top + t->currBlk->get_dy() > t->rows) t->top--;
-    	return;
-    }
+			  if (t->top + t->currBlk->get_dy() > t->rows) t->top--;
+    	  return;
+    	}
 };
 
 class onPass : public ActionHandler {
 	public:
-    void run(Tetris *t, char key) {return;}
+    	void run(Tetris *t, char key) {return;}
 };
 
 class myOnNewBlock : public ActionHandler {
 	public:
-	void run(Tetris *t, char key) {
-		if (t->currBlk != NULL) t->oScreen = myDeleteFullLines(t->oScreen, t->currBlk, t->top, t->left, t->wallDepth);
-		t->iScreen->paste(t->oScreen, 0, 0);
-		t->type = key - '0';
-		t->degree = 0;
-		t->top = t->wallDepth; 
-		t->left = t->cols/2 - t->wallDepth/2;
-		t->currBlk = t->setOfBlockObjects[t->type][t->degree];
-     	return; 
-	}
+		void run(Tetris *t, char key) {
+			if (t->currBlk != NULL)
+            t->oScreen = myDeleteFullLines(t->oScreen, t->currBlk, t->top, t->left, t->wallDepth);
+			t->iScreen->paste(t->oScreen, 0, 0);
+			t->type = key - '0';
+			t->degree = 0;
+			t->top = t->wallDepth; 
+			t->left = t->cols/2 - t->wallDepth/2;
+			t->currBlk = t->setOfBlockObjects[t->type][t->degree];
+      		return; 
+		}
 };
 
 int main(int argc, char *argv[]) {  
@@ -280,8 +281,8 @@ int main(int argc, char *argv[]) {
   Tetris::setOperation('a', TetrisState::Running,  new myOnLeft(),      TetrisState::Running,  new onPass(),      TetrisState::Running);
   Tetris::setOperation('d', TetrisState::Running,  new myOnRight(),     TetrisState::Running,  new onPass(),      TetrisState::Running);
   Tetris::setOperation('s', TetrisState::Running,  new myOnDown(),      TetrisState::Running,  new onPass(),      TetrisState::Running);
-  Tetris::setOperation('e', TetrisState::Running,  new myOnUp(), 	    TetrisState::Running,  new onPass(),      TetrisState::Running);
-  Tetris::setOperation(' ', TetrisState::Running,  new onPass(),        TetrisState::NewBlock, new onPass(), 	  TetrisState::Running);
+  Tetris::setOperation('e', TetrisState::Running,  new myOnUp(), 	      TetrisState::Running,  new onPass(),      TetrisState::Running);
+  Tetris::setOperation(' ', TetrisState::Running,  new onPass(),        TetrisState::NewBlock, new onPass(), 	    TetrisState::Running);
   Tetris::setOperation('1', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
   Tetris::setOperation('2', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
   Tetris::setOperation('3', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
@@ -302,7 +303,7 @@ int main(int argc, char *argv[]) {
     state = board->accept(key);
     drawScreen(board->get_oScreen(), board->get_wallDepth()); cout << endl;
     if (state == TetrisState::NewBlock) {
-	    key = (char) ('0' + rand() % board->get_numTypes());
+      key = (char) ('0' + rand() % board->get_numTypes());
       state = board->accept(key);
       drawScreen(board->get_oScreen(), board->get_wallDepth()); cout << endl;
       if (state == TetrisState::Finished) 
