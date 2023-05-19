@@ -192,16 +192,16 @@ void drawScreen(Matrix *screen, int wall_depth)
 Matrix *myDeleteFullLines(Matrix *screen, Matrix *blk, int top, int left, int dw) {
 	Matrix *rowZero, *colZero, *rowLine, *colLine;
   vector<pair<int, int>> deleteLineNum;
-	int screenLenth = screen->get_dy() - (2*dw);
-	rowZero = new Matrix(1, screenLenth); colZero = new Matrix(screenLenth, 1);
+  int colLenth = screen->get_dx() - (2*dw); int rowLenth = screen->get_dy() - (2*dw);
+	rowZero = new Matrix(1, colLenth); colZero = new Matrix(rowLenth, 1);
 
   for (int i = 0; i < dw; i++) {
     rowLine = new Matrix(); colLine = new Matrix();
     int rowInd = top + i; int colInd = left + i;
-    if (rowInd < screenLenth + dw){delete rowLine; rowLine = screen->clip(rowInd, dw, rowInd+1, dw + screenLenth);}
-    if (colInd < screenLenth + dw){delete colLine; colLine = screen->clip(dw, colInd, dw + screenLenth, colInd+1);}
-    if (rowLine->sum() == screenLenth) deleteLineNum.push_back(make_pair(ROW, rowInd-dw));
-    if (colLine->sum() == screenLenth) deleteLineNum.push_back(make_pair(COL, colInd-dw));
+    if (dw <= rowInd && rowInd < rowLenth + dw){delete rowLine; rowLine = screen->clip(rowInd, dw, rowInd+1, dw + colLenth);}
+    if (dw <= colInd && colInd < colLenth + dw){delete colLine; colLine = screen->clip(dw, colInd, dw + rowLenth, colInd+1);}
+    if (rowLine->sum() == colLenth) deleteLineNum.push_back(make_pair(ROW, rowInd-dw));
+    if (colLine->sum() == rowLenth) deleteLineNum.push_back(make_pair(COL, colInd-dw));
     delete rowLine; delete colLine;
   }
 
@@ -215,15 +215,45 @@ Matrix *myDeleteFullLines(Matrix *screen, Matrix *blk, int top, int left, int dw
 	return screen;
 }
 
-class onPass : public ActionHandler {
+class myOnUp : public ActionHandler {
 	public:
     	void run(Tetris *t, char key) {
-			if (t->top <= 0) t->top = t->top + 1;
-			else if ((t->top + t->currBlk->get_dy()) >= (t->rows)) t->top = t->top - 1;
-			else if (t->left <= 0) t->left = t->left + 1;
-			else if ((t->left + t->currBlk->get_dx()) >= (t->cols)) t->left = t->left - 1;
-    		return;
+        t->top--;
+			  if (t->top < 0) t->top++;
+    	  return;
     	}
+};
+
+class myOnLeft : public ActionHandler {
+	public:
+    	void run(Tetris *t, char key) {
+        t->left--;
+			  if (t->left < 0) t->left++;
+    	  return;
+    	}
+};
+
+class myOnRight : public ActionHandler {
+	public:
+    	void run(Tetris *t, char key) {
+        t->left++;
+			  if (t->left + t->currBlk->get_dx() > t->cols) t->left--;
+    	  return;
+    	}
+};
+
+class myOnDown : public ActionHandler {
+	public:
+    	void run(Tetris *t, char key) {
+        t->top++;
+			  if (t->top + t->currBlk->get_dy() > t->rows) t->top--;
+    	  return;
+    	}
+};
+
+class onPass : public ActionHandler {
+	public:
+    	void run(Tetris *t, char key) {return;}
 };
 
 class myOnNewBlock : public ActionHandler {
@@ -248,10 +278,10 @@ int main(int argc, char *argv[]) {
   TetrisState state;
   
   /////////////////////////////////////////////////////////////////////////
-  Tetris::setOperation('a', TetrisState::Running,  new OnLeft(),        TetrisState::Running,  new onPass(),      TetrisState::Running);
-  Tetris::setOperation('d', TetrisState::Running,  new OnRight(),       TetrisState::Running,  new onPass(),      TetrisState::Running);
-  Tetris::setOperation('s', TetrisState::Running,  new OnDown(),        TetrisState::Running,  new onPass(),      TetrisState::Running);
-  Tetris::setOperation('e', TetrisState::Running,  new OnUp(), 	        TetrisState::Running,  new onPass(),      TetrisState::Running);
+  Tetris::setOperation('a', TetrisState::Running,  new myOnLeft(),      TetrisState::Running,  new onPass(),      TetrisState::Running);
+  Tetris::setOperation('d', TetrisState::Running,  new myOnRight(),     TetrisState::Running,  new onPass(),      TetrisState::Running);
+  Tetris::setOperation('s', TetrisState::Running,  new myOnDown(),      TetrisState::Running,  new onPass(),      TetrisState::Running);
+  Tetris::setOperation('e', TetrisState::Running,  new myOnUp(), 	      TetrisState::Running,  new onPass(),      TetrisState::Running);
   Tetris::setOperation(' ', TetrisState::Running,  new onPass(),        TetrisState::NewBlock, new onPass(), 	    TetrisState::Running);
   Tetris::setOperation('1', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
   Tetris::setOperation('2', TetrisState::NewBlock, new myOnNewBlock(),  TetrisState::Running,  new OnFinished(),  TetrisState::Finished);
