@@ -203,7 +203,7 @@ Matrix *myDeleteFullLines(Matrix *screen, Matrix *blk, int top, int left, int dw
 		if (rowLine->sum() == colLenth) deleteLineNum.push_back(make_pair(ROW, rowInd-dw));
 		if (colLine->sum() == rowLenth) deleteLineNum.push_back(make_pair(COL, colInd-dw));
 		delete rowLine; delete colLine;
-  }
+  	}
 
 	for (auto lineInfo: deleteLineNum) {
 		int lineType = lineInfo.first; int lineInd = lineInfo.second;
