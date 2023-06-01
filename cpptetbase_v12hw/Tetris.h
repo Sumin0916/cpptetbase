@@ -11,8 +11,12 @@ enum class TetrisState {
     Finished,
 };
 
+extern Matrix *deleteFullLines(Matrix *screen, Matrix *blk, int top, int dw);
+//extern int *allocArrayScreen(int dy, int dx, int dw);
+//extern void deallocArrayScreen(int *array);
+
 class Tetris {
-private:
+protected:
     // static members
     static Matrix ***setOfBlockObjects;
     static int numTypes;
@@ -21,21 +25,16 @@ private:
 
     // dynamic members
     int rows; // rows of screen = dy + wallDepth
-    int cols; // rows of columns = dx + 2*wallDepth
-
+    int cols; // columns of screen = dx + 2*wallDepth
     int type;
     int degree;
     int top; 
     int left;
 
     TetrisState state;
-
     Matrix *iScreen;
     Matrix *oScreen;
     Matrix *currBlk;
-    
-    int *allocArrayScreen(int dy, int dx, int dw);
-    void deallocArrayScreen(int *array);
 
 public:
     static void init(int **setOfBlockArrays, int nTypes, int nDegrees);

@@ -1,9 +1,9 @@
 # Set compiler to use
 CC=g++
-CFLAGS=-g -I. -fpermissive
+CFLAGS=-g -I. -fpermissive -lncursesw
 LDFLAGS_TET=
 DEPS_TET=Tetris.h Matrix.h
-OBJS_TET=Main.o Tetris.o Matrix.o ttymodes.o
+OBJS_TET=Main.o CTetris.o Tetris.o Matrix.o Window.o ttymodes.o
 DEBUG=0
 
 all:: Main.exe
