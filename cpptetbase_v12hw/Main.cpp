@@ -231,10 +231,10 @@ void drawScreen(Matrix *screen, int wall_depth, Window *win) {
 static ifstream infStream;
 static ofstream outfStream;
 
-char getTetrisKey(TetrisState state, bool fromUser, bool toFile) {
-  char key;
+char getTetrisKey(TetrisState state, bool fromUser, bool toFile) { // 우리가 주목해야 하는 함수다
+  char key; // 
 
-  if (fromUser == true) {
+  if (fromUser == true) { //사용자한테 입력을 받기 원하느냐(거짓이면 파일에서 가져올거다 :자동화 테스트)
     if (state == TetrisState::NewBlock)
       key = (char) ('0' + rand() % MAX_BLK_TYPES);
     else
@@ -253,18 +253,19 @@ char getTetrisKey(TetrisState state, bool fromUser, bool toFile) {
     else
       infStream.get(key); // why not "infStream >> key" ?
 
-    usleep(100000); // 100 ms
+    usleep(100000); // 100 ms 이걸 없애면 Replay가 너무 빨리 끝낸다.
   }
 
-  if (toFile == true) {
+  if (toFile == true) { // KEY 값을 저장해라 이 안에서 과제 코드 거의 다 작성을 해야한다.
+  //게임이 끝났는지 안 끝났는지 판단은 여기서 없다. Main에서 고쳐야할 수도 있다.
     if (outfStream.is_open() == false) {
-      outfStream.open("keyseq.txt");
+      outfStream.open("keyseq.txt"); // 쓰기 모드로 1번만 오픈 하면 된다.
       if (outfStream.fail()) {
         cout << "keyseq.txt cannot be opened!" << endl;
         exit(1);
       }
-      // outfStream.close(); // truncate the existing file
-      // outfStream.open("keyseq.txt", ios::app);
+      // outfStream.close(); // truncate the existing file 이 코드 2줄은 사용되면 안된다 사용해도 되긴 하지만 두 번 오픈 된거다.
+      // outfStream.open("keyseq.txt", ios::app); 파일을 지우고 append는 그냥 쓰기 모드랑 같기 때문이다.
     }
     outfStream << key;
   }
@@ -319,7 +320,7 @@ int main(int argc, char *argv[]) {
   bttm_win.printw("123456789012345678901234567890123456789012345678901234567890");
   bttm_win.printw("Program started!\n");
 
-  TetrisState state;
+  TetrisState state; //과거의 컬러테트리스 모범답안 사용 플러그인 사용 안 한거 코드가 길어져서
   CTetris::init(setOfColorBlockArrays, MAX_BLK_TYPES, MAX_BLK_DEGREES);
   CTetris *board = new CTetris(10, 10);
   key = getTetrisKey(TetrisState::NewBlock, fromUser, toFile);
@@ -341,7 +342,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  if (infStream.is_open() == true) 
+  if (infStream.is_open() == true) //게임이 끝나도 열려있으면(짜투리가 남아있으면 플러시해야하는데 그 타이밍을 어디서 잡을지는 자체적으로 판단)
     infStream.close();
 
   if (outfStream.is_open() == true) 
