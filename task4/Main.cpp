@@ -229,7 +229,8 @@ void drawScreen(Matrix *screen, int wall_depth, Window *win) {
 /**************************************************************/
 /******************** Tetris Main Loop ************************/
 /**************************************************************/
-
+#define BUFFERCAP 10
+#define endl '\n'
 static ifstream infStream;
 static ofstream outfStream;
 string buff;
@@ -251,10 +252,14 @@ char getTetrisKey(TetrisState state, bool fromUser, bool toFile, string &buff) {
         exit(1);
       }
     }
-    if (infStream.eof() == true)
-      key = 'q';
-    else
-      infStream.read((char *)buff.c_str(), 10); // why not "infStream >> key" ?
+    if (infStream.eof() == true) key = 'q';
+    else {
+        if (buff.length() == 0) {
+          buff.resize(BUFFERCAP); 
+          infStream.read(&buff[0], BUFFERCAP);
+        }
+      key = buff.front(); buff.erase(buff.begin());
+    } // why not "infStream >> key" ?
 
     usleep(100000); // 100 ms 이걸 없애면 Replay가 너무 빨리 끝낸다.
   }
@@ -270,14 +275,15 @@ char getTetrisKey(TetrisState state, bool fromUser, bool toFile, string &buff) {
       // outfStream.close(); // truncate the existing file 이 코드 2줄은 사용되면 안된다 사용해도 되긴 하지만 두 번 오픈 된거다.
       // outfStream.open("keyseq.txt", ios::app); 파일을 지우고 append는 그냥 쓰기 모드랑 같기 때문이다.
     }
-    if (buff.length() < 10) {
+    if (buff.length() < BUFFERCAP) {
       buff.push_back(key);
-      if (buff.length() == 10) {
-        outfStream.write(buff.c_str(), 10);
+      if (buff.length() == BUFFERCAP) {
+        outfStream.write(buff.c_str(), BUFFERCAP);
         buff.clear();
       }
     }
   }
+
   return key;
 }
 
