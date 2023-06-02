@@ -21,6 +21,7 @@ int main() {
         count++;
         total += score;
     }
+
     if (count > 0)
     {
         average = total / count;
@@ -28,7 +29,7 @@ int main() {
 
     ss.clear();
     ss.str("");
-    ss << "Name: "<< name << " / Average: " << average;
+    ss << "Name: "<< name << "\nAverage: " << average;
 
     cout << ss.str() << endl;
     return 0;
