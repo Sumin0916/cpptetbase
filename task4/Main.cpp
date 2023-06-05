@@ -229,8 +229,9 @@ void drawScreen(Matrix *screen, int wall_depth, Window *win) {
 /**************************************************************/
 /******************** Tetris Main Loop ************************/
 /**************************************************************/
-#define BUFFERCAP 10
 #define endl '\n'
+
+constexpr int BUFFERCAP = 10;
 static ifstream infStream;
 static ofstream outfStream;
 string buff;
