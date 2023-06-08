@@ -11,12 +11,12 @@ enum class TetrisState {
     Finished,
 };
 
-extern Matrix *deleteFullLines(Matrix *screen, Matrix *blk, int top, int dw); //extern선언 : colortet쪽에서도 이게 필요해서 호출하기 위해 붙여줌
+extern Matrix *deleteFullLines(Matrix *screen, Matrix *blk, int top, int dw);
 //extern int *allocArrayScreen(int dy, int dx, int dw);
 //extern void deallocArrayScreen(int *array);
 
 class Tetris {
-protected: // 자식이 상속받고 쓸 수 있도록 protedted로 선언해줌 (v4)와 차이점
+protected:
     // static members
     static Matrix ***setOfBlockObjects;
     static int numTypes;
